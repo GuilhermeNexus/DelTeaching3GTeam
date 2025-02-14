@@ -1,0 +1,50 @@
+services:
+  api:
+    image: hello-world
+    container_name: api
+    restart: always
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - "8001:8000"
+    networks:
+      - delteaching_network
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - delteaching_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - delteaching_network
+
+volumes:
+  postgres_data:
+
+networks:
+  delteaching_network:
+    driver: bridge
