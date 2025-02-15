@@ -12,6 +12,21 @@ services:
       - "8001:8000"
     networks:
       - delteaching_network
+  
+  front-end:
+    image: 
+    container_name: api
+    restart: always
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - "8001:8000"
+    networks:
+      - delteaching_network
+
 
   db:
     image: postgres:latest
