@@ -1,0 +1,20 @@
+services:
+  api:
+    build: ./bank-accounts # Caminho para o Dockerfile do BankAccounts
+    container_name: bank-accounts
+    restart: always
+    environment:
+      DATABASE_URL: ${DATABASE_URL}  # Usando a variável do .env para o PostgreSQL externo
+      RABBITMQ_URL: ${RABBITMQ_URL}  # Usando a variável do .env para o RabbitMQ externo
+    ports:
+      - "3000:3000" # Expõe a porta 3000 do container para a porta 3000 do host
+    networks:
+      - delteaching_network
+    command: ["sh", "-c", "until nc -z -v -w30 137.184.148.83 5432; do echo 'Waiting for DB...'; sleep 5; done; until nc -z -v -w30 delt-rabbitmq.delbank.srv.br 5672; do echo 'Waiting for RabbitMQ...'; sleep 5; done; npm run start"]  # Espera o PostgreSQL e RabbitMQ externos
+
+volumes:
+  postgres_data:
+
+networks:
+  delteaching_network:
+    driver: bridge
